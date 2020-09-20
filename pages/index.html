@@ -1,6 +1,6 @@
 <html>
     <head>
-        <title>dakk Delegate Pool</title>
+        <title>bfx Delegate Pool</title>
         <link href="https://bootswatch.com/3/flatly/bootstrap.min.css" rel="stylesheet">
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
@@ -8,8 +8,8 @@
     </head>
     <body ng-app="delegateApp" ng-controller="indexCtrl">
         <div class="container">
-            <h1>dakk Delegate Pool (<a href="https://explorer.lisk.io/address/2324852447570841050L" target="_blank">Explorer</a>, <a href="https://forum.lisk.io/viewtopic.php?f=48&t=1094" target="_blank">Proposal</a>)</h1>
-            <div class="alert alert-info" role="alert">Sharing weekly 15% of forged amount to voters; vote for delegate dakk to receive a reward in the next week.</div>
+            <h1>bfx Delegate Pool (<a href="https://explorer.shiftnrg.org/delegate/4232221127422449264S" target="_blank">Explorer</a>, <a href="https://discord.gg/rbXb9xQ" target="_blank">Proposal</a>)</h1>
+            <div class="alert alert-info" role="alert">Sharing weekly 50% of forged amount to voters; vote for delegate bfx to receive a reward in the next week.</div>
 
             <div class="row">
                 <div class="col-md-4">
@@ -34,10 +34,10 @@
 
             <div class="row">
                 <div class="col-md-6">
-                    <div class="alert alert-success" role="alert">Total paid: {{total.paid|number:8}} LSK</div>
+                    <div class="alert alert-success" role="alert">Total paid: {{total.paid|number:8}} SHIFT</div>
                 </div>
                 <div class="col-md-6">
-                    <div class="alert alert-danger" role="alert">Total pending: {{total.pending|number:8}} LSK</div>
+                    <div class="alert alert-danger" role="alert">Total pending: {{total.pending|number:8}} SHIFT</div>
                 </div>
             </div>
 
@@ -45,8 +45,8 @@
                 <thead>
                     <tr>
                         <th>Address</th>
-                        <th>Paid (LSK)</th>
-                        <th>Pending (LSK)</th>
+                        <th>Paid (SHIFT)</th>
+                        <th>Pending (SHIFT)</th>
                 </thead>
                 <tbody>
                     <tr ng-repeat="acc in (accounts|orderBy:'-received')">

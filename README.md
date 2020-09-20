@@ -1,34 +1,81 @@
-# Lisk pool distribution software
-This software is created by lisk delegate "dakk", please consider a small donation if you
-use this software: 
+# SHIFT-pool distribution software
+This software was originally created by lisk delegate "dakk", which I've edited slightly for easier use. 
+Please consider a small donation to dakk if you use this software: 
 - "2324852447570841050L" for lisk
 - "7725849364280821971S" for shift
 - "AZAXtswaWS4v8eYMzJRjpd5pN3wMBj8Rmk" for ark
 - "8691988869124917015R" for rise
 
-
 ## Configuration
-Fork this repo; edit config.json and modify the first lines with your settings:
+Configuration options include:
 
 - pubkey: your delegate pubkey
 - address: your delegate address
-- percentage: percentage to distribute
+- percentage: percentage to distribute (change P to an integer, for example 50)
+- minpayout: the minimum amount for a payout (change M to a decimal number, for example 0.01)
 - secret: your secret
 - secondsecret: your second secret or null if disabled
-- node: the lisk node where you get forging info
-- nodepay: the lisk node used for payments
-- minpayout: the minimum amount for a payout
-- coin: the name of the coin (LISK, ARK, SHIFT, RISE, KAPU, OXY or whatever you want)
+- donations: a list of object (address: amount) for send static amount every payout, can be used for reserve & donations (change reserve_address to your reserve/donations address and change R to an integer or decimal number)
+- donationspercentage: a list of object (address: percentage) for send same percentage every payout
+- node: the shift node where you get forging info + API port (default: localhost:9305)
+- nodepay: the shift node used for payments + API port (default: localhost:9305)
+- logfile: file where you want to write pending and sent amounts (default: poollogs.json)
+- feededuct: true if you want to subtract fees from user payouts (default: false)
+- private: true or false for private pool
+- whitelist: list of addresses to include in private pool
 - skip: a list of address to skip
-- donations: a list of object (address: amount) for send static amount every payout
-- donationspercentage: a list of object (address: percentage) for send static percentage every payout
-- logfile: file where you want to write pending and sent amounts
-- feededuct: true if you want to subtract fees from user payouts
 
-Now edit docs/index.html and customize the webpage.
+You can also edit docs/index.html and customize the webpage, or leave as is if not running webpage.
 
-Finally edit poollogs_example.json and put in lastpayout the unixtimestamp of your last payout or the
-date of pool starting; then move poollogs_example.json to poollogs.json.
+## Setting it up & running it
+
+First clone the shift-pool repository: 
+
+```git clone https://github.com/Bx64/shift-pool```
+
+```cd shift-pool```
+
+Edit your config.json file with the above entries:
+
+```nano config.json```
+
+You'll need to change the following lines:
+
+```
+"pubkey": "delegate_pubkey",	
+"address": "delegate_address",	
+"percentage": P,	
+"minpayout": M,	
+"secret": "delegate_secret",	
+"secondsecret": "delegate_secret2",
+"donations": { "reserve_address": R
+```
+
+Further modifications are possible, but may require edits in shiftpool.py as well. This is at your own risk.
+
+Edit poollogs.json and put in lastpayout the unix-timestamp of your last payout, or the date of pool starting:
+
+```nano poollogs.json```
+
+Install python3-pip and requests:
+
+```sudo apt-get install python3```
+
+```sudo apt-get install python3-pip```
+
+```pip3 install requests```
+
+Then start it:
+
+```python3 shiftpool.py```
+
+It produces a file "payments.sh" with all payments shell commands. Run this file with:
+
+```bash payments.sh```
+
+The payments will be broadcasted (every 10 seconds). At the end you can move your generated poollogs.json to docs/poollogs.json:
+
+```cp poollogs.json docs/poollogs.json```
 
 ### Private pool
 If you want to run a private pool, you need to edit config.json and:
@@ -36,88 +83,75 @@ If you want to run a private pool, you need to edit config.json and:
 - private: set to true
 - whitelist: put a list of address you wish to include
 
-### Ark & Kapu
-If you are using this software on ark, you should edit pollogs_example_ark.json and put:
+### Possible issues and fixes when installing/running
 
-- lastpayout: the unixtimestamp of your last payout or the date of pool starting 
-- lastforged: the forged amount recorded in your last payout or the forged amount of pool starting
+#### Cache folder ownership issue
 
-then move poollogs_example_ark.json to poollogs.json.
+Several users have mentioned running into permission issues with their ``.cache`` folder when installing requests. The fix for this is running this additional command AFTER installing python3-pip & BEFORE installing requests, replacing ``$USER`` with your username:
 
-Also, replace docs/index.html with docs/index.ark.html
+```cd && sudo chown -R $USER .cache```
 
-## Running it
+#### shiftpool.py cannot get rewards
 
-First clone the lisk-pool repository and install requests:
+You should add ``"127.0.0.1"`` to the whitelist section of the configuration file for your SHIFT node, then reload your node:
 
-```git clone https://github.com/dakk/lisk-pool```
+```nano shift-lisk/config.json```
 
-```cd lisk-pool```
+```shift-lisk/shift_manager.bash reload```
 
-```apt-get install python3-pip```
+## Using a personal shift-pool repository on GitHub as your pool's front-end
 
-```pip3 install requests```
+It is also possible to use GitHub as your pool front-end. First, fork this repository. Then you can follow the above instructions, BUT replace 'Bx64' in the ``git clone`` command to your username. Assuming this is $USER, the first command will be:
 
-### Lisk
-If you are using lisk, you need to install lisk commander:
+```git clone https://github.com/$USER/shift-pool```
 
-```bash
-npm install --global --production lisk-commander@2.2.3
-```
+After that, follow the rest of the instructions exactly as described above. After completing the setup and running your payout, you can send the update to your Git repo:
 
-### Rise
-If you are using rise you need to dpos-api-fallback:
+```git add docs/poollogs.json```
 
-```bash
-git clone https://github.com/vekexasia/dpos-api-fallback
-cd dpos-api-fallback
-npm install
-npm run package
-```
+```git commit -m "payouts update"```
 
-Then start it:
+```git push -u origin master```
 
-```python3 liskpool.py```
+Or run the following script and have those automated:
 
-or if you want to use another config file:
+```bash pool-update.sh```
 
-```python3 liskpool.py -c config2.json```
-
-It produces a file "payments.sh" with all payments shell commands. Run this file with:
-
-```bash payments.sh```
-
-The payments will be broadcasted (every 10 seconds). At the end you can move your generated
-poollogs.json to docs/poollogs.json and send the update to your git repo.
-
-To display the pool frontend, enable docs-site on github repository settings.
-
+To display the pool frontend, enable docs-site on GitHub repository settings. 
 
 ## Batch mode
 
 The script is also runnable by cron using the -y argument:
 
-`python3 liskpool.py -y`
+```python3 shiftpool.py -y```
 
-There is also a 'batch.sh' file which run liskpool, then payments.sh and copy the poollogs.json
-in the docs folder.
+There is also a 'pay.sh' file which runs shiftpool.py, then payments.sh and copy the poollogs.json in the docs folder.
 
+## Cronjob to automate payouts
+
+Set this command as cronjob to automate payouts at chosen intervals:
+
+```cd shift-pool && python3 shiftpool.py -y && sleep 5 && bash payments.sh && sleep 5 && cp poollogs.json docs/poollogs.json```
+
+Payouts are not automatically uploaded to GitHub using this cronjob, you'll need to do that manually or using the pool-update.sh script.
 
 ### Avoid vote hoppers
 
-In some DPOS, some voters switch their voting weight from one delegate to another for
-receiving payout from multiple pools. A solution for that is the following flow:
+In some DPOS, voters switch their voting weight from one delegate to another for receiving payout from multiple pools. A solution for that is the following flow:
 
-1. Run liskpool.py every hour with --min-payout=1000000 (a very high minpayout, so no payouts will be done but the pending will be updated)
-2. Run liskpool.py normally to broadcast the payments
+1. Run shiftpool.py every hour with --min-payout=1000000 (a very high minpayout, so no payouts will be done but the pending will be updated);
+2. Run shiftpool.py normally to broadcast the payments
 
+Running the shiftpool.py command in step 2 should only be done after forging another block (or several to be sure), otherwise it will not pick up any changes and not broadcast the payments. My advice would be setting the cronjob of step 1 to run every hour at half past, whilst setting the cronjob of step 2 to run once a day at a whole hour.
+
+Instead of setting commands, you can also set the cronjobs using these scripts: (1) prevent-poolhopping.sh && (2) pay.sh
 
 ## Command line usage
 
 ```
-usage: liskpool.py [-h] [-c config.json] [-y] [--min-payout MINPAYOUT]
+usage: shiftpool.py [-h] [-c config.json] [-y] [--min-payout MINPAYOUT]
 
-DPOS delegate pool script
+SHIFT delegate pool script
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -127,26 +161,6 @@ optional arguments:
                         override the minpayout value from config file
 ```
 
-## Lisk and Rise migration for version 1.0
-
-Since Lisk version 1.0.0 and Rise version 1.0, APIs with secret used for creating 
-transaction are not available anymore, so we need to use the dpos-api-fallback
-(a special thanks for vekexasia who made this tool). 
-
-First, update the lisk-pool source, update the config.json with new fields, then install dpos-api-fallback inside the lisk-pool
-directory:
-
-```bash
-cd lisk-pool
-git clone https://github.com/vekexasia/dpos-api-fallback
-cd dpos-api-fallback
-npm install
-npm run package
-```
-
-**nodejs >= 6 is mandatory for running dpos-api-fallback!**
-
-
 ## License
 Copyright 2017-2018 Davide Gessa
 
@@ -155,4 +169,3 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-

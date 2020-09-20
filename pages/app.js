@@ -7,7 +7,7 @@ app.controller('indexCtrl', function($scope, $http) {
 
     $http.get ('poollogs.json').then (function (res) {
         $scope.lastpayout = res.data.lastpayout * 1000;
-        $scope.nextpayout = moment ($scope.lastpayout).add (4, 'week').valueOf();
+        $scope.nextpayout = moment ($scope.lastpayout).add (1, 'week').valueOf();
         $scope.accounts = [];
         $scope.total = { paid: 0.0, pending: 0.0 };
 
@@ -20,7 +20,7 @@ app.controller('indexCtrl', function($scope, $http) {
         }
     });
 
-    $http.get ('https://wallet.lisknode.io/api/delegates/get?username=dakk').then (function (res) {
+    $http.get ('https://wallet.shiftnrg.org/api/delegates/get?username=bfx').then (function (res) {
         $scope.delegate = res.data.delegate;
     });
 });
