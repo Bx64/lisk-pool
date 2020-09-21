@@ -17,8 +17,8 @@ Configuration options include:
 - secondsecret: your second secret or null if disabled
 - donations: a list of object (address: amount) for send static amount every payout, can be used for reserve & donations (change reserve_address to your reserve/donations address and change R to an integer or decimal number)
 - donationspercentage: a list of object (address: percentage) for send same percentage every payout
-- node: the shift node where you get forging info + API port (default: localhost:9305)
-- nodepay: the shift node used for payments + API port (default: localhost:9305)
+- node: the shift node where you get forging info + API port (mainnet: localhost:9305, testnet: localhost:9306, custom: IP:port)
+- nodepay: the shift node used for payments + API port (mainnet: localhost:9305, testnet: localhost:9306, custom: IP:port)
 - logfile: file where you want to write pending and sent amounts (default: poollogs.json)
 - feededuct: true if you want to subtract fees from user payouts (default: false)
 - private: true or false for private pool
@@ -27,7 +27,7 @@ Configuration options include:
 
 You can also edit docs/index.html and customize the webpage, or leave as is if not running webpage.
 
-## Setting it up & running it
+## Setting up & running the shift-pool script
 
 First clone the shift-pool repository: 
 
@@ -139,12 +139,10 @@ Payouts are not automatically uploaded to GitHub using this cronjob, you'll need
 
 In some DPOS, voters switch their voting weight from one delegate to another for receiving payout from multiple pools. A solution for that is the following flow:
 
-1. Run shiftpool.py every hour with --min-payout=1000000 (a very high minpayout, so no payouts will be done but the pending will be updated);
+1. Run shiftpool.py every hour with --min-payout=10000000000 (a very high minpayout, so no payouts will be done but the pending will be updated);
 2. Run shiftpool.py normally to broadcast the payments
 
-Running the shiftpool.py command in step 2 should only be done after forging another block (or several to be sure), otherwise it will not pick up any changes and not broadcast the payments. My advice would be setting the cronjob of step 1 to run every hour at half past, whilst setting the cronjob of step 2 to run once a day at a whole hour.
-
-Instead of setting commands, you can also set the cronjobs using these scripts: (1) prevent-poolhopping.sh && (2) pay.sh
+If no new forged blocks are discovered by the API request, shift-pool.py will exit automatically. You can set the commands as cronjobs to automate the above flow. Additionally, instead of setting commands, you can also set the cronjobs using these scripts: (1) prevent-poolhopping.sh && (2) pay.sh
 
 ## Command line usage
 
