@@ -25,7 +25,7 @@ Configuration options include:
 - whitelist: list of addresses to include in private pool
 - skip: a list of address to skip
 
-You can also edit docs/index.html and customize the webpage, or leave as is if not running webpage.
+You can also edit pages/index.html and customize the webpage, or leave as is if not running webpage.
 
 ## Setting up & running the shift-pool script
 
@@ -73,9 +73,9 @@ It produces a file "payments.sh" with all payments shell commands. Run this file
 
 ```bash payments.sh```
 
-The payments will be broadcasted (every 10 seconds). At the end you can move your generated poollogs.json to docs/poollogs.json:
+The payments will be broadcasted (every 10 seconds). At the end you can move your generated poollogs.json to pages/poollogs.json:
 
-```cp poollogs.json docs/poollogs.json```
+```cp poollogs.json pages/poollogs.json```
 
 ### Private pool
 If you want to run a private pool, you need to edit config.json and:
@@ -107,7 +107,7 @@ It is also possible to use GitHub as your pool front-end. First, fork this repos
 
 After that, follow the rest of the instructions exactly as described above. After completing the setup and running your payout, you can send the update to your Git repo:
 
-```git add docs/poollogs.json```
+```git add pages/poollogs.json```
 
 ```git commit -m "payouts update"```
 
@@ -117,7 +117,7 @@ Or run the following script and have those automated:
 
 ```bash pool-update.sh```
 
-To display the pool frontend, enable docs-site on GitHub repository settings. 
+To display the pool frontend, enable GitHub Pages on GitHub repository settings. 
 
 ## Batch mode
 
@@ -125,13 +125,13 @@ The script is also runnable by cron using the -y argument:
 
 ```python3 shiftpool.py -y```
 
-There is also a 'pay.sh' file which runs shiftpool.py, then payments.sh and copy the poollogs.json in the docs folder.
+There is also a 'pay.sh' file which runs shiftpool.py, then payments.sh and copy the poollogs.json in the pages folder.
 
 ## Cronjob to automate payouts
 
 Set this command as cronjob to automate payouts at chosen intervals:
 
-```cd shift-pool && python3 shiftpool.py -y && sleep 5 && bash payments.sh && sleep 5 && cp poollogs.json docs/poollogs.json```
+```cd shift-pool && python3 shiftpool.py -y && sleep 5 && bash payments.sh && sleep 5 && cp poollogs.json pages/poollogs.json```
 
 Payouts are not automatically uploaded to GitHub using this cronjob, you'll need to do that manually or using the pool-update.sh script.
 
