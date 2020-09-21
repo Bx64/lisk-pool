@@ -2,7 +2,7 @@ import requests
 import json
 import sys
 import time
-import argparse 
+import argparse
 
 if sys.version_info[0] < 3:
 	print ('python2 not supported, please use python3')
@@ -21,14 +21,14 @@ parser.add_argument('--min-payout', type=float, dest='minpayout', action='store'
 		help='override the minpayout value from config file')
 
 args = parser.parse_args ()
-	
+
 # Load the config file
 try:
 	conf = json.load (open (args.cfile, 'r'))
 except:
 	print ('Unable to load config file.')
 	sys.exit ()
-	
+
 if 'logfile' in conf:
 	LOGFILE = conf['logfile']
 else:
@@ -54,15 +54,15 @@ def loadLog ():
 		data = json.load (open (LOGFILE, 'r'))
 	except:
 		data = {
-			"lastpayout": 0, 
+			"lastpayout": 0,
 			"accounts": {},
 			"skip": []
 		}
 	return data
-	
+
 def saveLog (log):
 	json.dump (log, open (LOGFILE, 'w'), indent=4, separators=(',', ': '))
-	
+
 def createPaymentLine (to, amount):
 	data = { "secret": conf['secret'], "amount": int (amount * 100000000), "recipientId": to }
 	if conf['secondsecret'] != None:
@@ -80,45 +80,45 @@ def estimatePayouts (log):
 	rewtotal = (int (rew) / 100000000)
 	forged = (int (rew) / 100000000) * conf['percentage'] / 100
 	print ('To distribute: %f SHIFT' % (forged))
-	
+
 	if forged < 0.1:
 		return ([], log, 0.0)
 
 	print ('Getting voters...')
-		
+
 	d = requests.get ('http://' + conf['node'] + '/api/delegates/voters?publicKey=' + conf['pubkey']).json ()
-	
+
 	weight = 0.0
 	payouts = []
-	
+
 	for x in d['accounts']:
 		if x['balance'] == '0' or x['address'] in conf['skip']:
 			continue
 
 		if 'private' in conf and conf['private'] and not (x['address'] in conf['whitelist']):
 			continue
-			
+
 		weight += float (x['balance']) / 100000000
-		
+
 	print ('Total weight is: %f' % weight)
-	
+
 	for x in d['accounts']:
 		if int (x['balance']) == 0 or x['address'] in conf['skip']:
 			continue
-			
+
 		if 'private' in conf and conf['private'] and not (x['address'] in conf['whitelist']):
 			continue
 
 		payouts.append ({ "address": x['address'], "balance": (float (x['balance']) / 100000000 * forged) / weight})
 		#print (float (x['balance']) / 100000000, payouts [x['address']], x['address'])
-		
+
 	return (payouts, log, forged, rewtotal)
-	
+
 def pool ():
 	log = loadLog ()
-	
+
 	(topay, log, forged, rewtotal) = estimatePayouts (log)
-		
+
 	f = open ('payments.sh', 'w')
 
 	i = 1
@@ -132,32 +132,32 @@ def pool ():
 		pending = 0
 		if x['address'] in log['accounts']:
 			pending = log['accounts'][x['address']]['pending']
-			
+
 		# If below minpayout, put in the accoutns pending and skip
 		if (x['balance'] + pending - fees) < conf['minpayout'] and x['balance'] > 0.0:
 			log['accounts'][x['address']]['pending'] += x['balance']
 			continue
-			
+
 		# If above, update the received balance and write the payout line
 		log['accounts'][x['address']]['received'] += (x['balance'] + pending)
 		if pending > 0:
 			log['accounts'][x['address']]['pending'] = 0
-		
+
 
 		f.write ('echo ['+str(i)+'/'+str(n)+'] Sending ' + str (x['balance'] - fees) + ' \(+' + str (pending) + ' pending\) to ' + x['address'] + '\n')
 		f.write (createPaymentLine (x['address'], x['balance'] + pending - fees))
 		i += 1
-			
+
 	# Handle pending balances
 	for y in log['accounts']:
 		# If the pending is above the minpayout, create the payout line
 		if log['accounts'][y]['pending'] - fees > conf['minpayout']:
 			f.write ('echo Sending pending ' + str (log['accounts'][y]['pending']) + ' to ' + y + '\n')
 			f.write (createPaymentLine (y, log['accounts'][y]['pending'] - fees))
-			
+
 			log['accounts'][y]['received'] += log['accounts'][y]['pending']
 			log['accounts'][y]['pending'] = 0.0
-			
+
 	# Donations
 	if 'donations' in conf:
 		for y in conf['donations']:
@@ -168,16 +168,16 @@ def pool ():
 	if 'donationspercentage' in conf:
 		for y in conf['donationspercentage']:
 			am = (rewtotal * conf['donationspercentage'][y]) / 100
-			
+
 			f.write ('echo Sending donation ' + str (conf['donationspercentage'][y]) + '% \(' + str (am) + 'SHIFT\) to ' + y + '\n')	
 			f.write (createPaymentLine (y, am))
 
 	# Update last payout
 	log['lastpayout'] = int (time.time ())
-	
+
 	for acc in log['accounts']:
 		print (acc, '\tPending:', log['accounts'][acc]['pending'], '\tReceived:', log['accounts'][acc]['received'])
-	
+
 	if args.alwaysyes:
 		print ('Saving...')
 		saveLog (log)
