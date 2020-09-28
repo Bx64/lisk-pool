@@ -73,7 +73,7 @@ It produces a file "payments.sh" with all payments shell commands. Run this file
 
 ```bash payments.sh```
 
-The payments will be broadcasted (every 10 seconds). At the end you can move your generated poollogs.json to pages/poollogs.json:
+The payments will be broadcasted at an interval of 0.5 seconds. At the end you can move your generated poollogs.json to pages/poollogs.json:
 
 ```cp poollogs.json pages/poollogs.json```
 
