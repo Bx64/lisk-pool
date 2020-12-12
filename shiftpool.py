@@ -81,9 +81,9 @@ def estimatePayouts (log):
 	forged = (int (rew) / 100000000) * conf['percentage'] / 100
 	print ('To distribute: %f SHIFT' % (forged))
 
-        if forged < 0.1:
-                print ('No SHIFT forged: exiting script')
-                sys.exit ()
+	if forged < 0.1:
+		print ('No SHIFT forged: exiting script')
+		sys.exit ()
 
 	print ('Getting voters...')
 
