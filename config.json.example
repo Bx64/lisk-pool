@@ -8,10 +8,10 @@
 
 	"donations": {
 		"4232221127422449264S": 5                                                             // will send 5 SHIFT each payout to 6323231687467908627S, address in quotes, amount has no quotes
-		},
+		},                                                                                    // if unused: remove the full line above this one leaving only {},
 	"donationspercentage": {
 		"4232221127422449264S": 10                                                            // will send 10% of forged SHIFT each payout to 4232221127422449264S, address in quotes, amount has no quotes
-		},
+		},                                                                                    // if unused: remove the full line above this one leaving only {},
 
 	"node": "localhost:9305",                                                                     // IP:port of your node (in quotes ""), do not change if you did not touch this in node config
 	"nodepay": "localhost:9305",                                                                  // IP:port of your node (in quotes ""), do not change if you did not touch this in node config
