@@ -7,7 +7,8 @@ Please consider a small donation to dakk if you use this software:
 - "8691988869124917015R" for rise
 
 ## Configuration
-Configuration options include:
+Configuration options of your **config.json** file are listed below. Please read in detail.
+You can also checkout the [example config file](https://github.com/Bx64/shift-pool/blob/master/config.json.example) for an example configuration.
 
 - pubkey: your delegate pubkey
 - address: your delegate address
